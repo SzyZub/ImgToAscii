@@ -36,38 +36,32 @@ unsigned char* resize_image(unsigned char* input, int original_width, int origin
 }
 
 unsigned char* load_jpeg_file(int *width, int* height, int *channels) {
-    FILE* infile = fopen("ImageFolder/image.jpg", "rb");
-    if (!infile) {
-        fprintf(stderr, "Error opening file");
-        return NULL;
-    }
     struct jpeg_decompress_struct cinfo;
     struct jpeg_error_mgr jerr;
+    unsigned char* rowBuffer[1];
+    FILE* infile = fopen("ImageFolder/image.jpg", "rb");
+    if (!infile) {
+        fprintf(stderr, "Error opening file, it isn't put into the imageFolder, has a wrong format or doesn't have a 'image' name");
+        return NULL;
+    }
+
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_decompress(&cinfo);
     jpeg_stdio_src(&cinfo, infile);
     jpeg_read_header(&cinfo, TRUE);
     jpeg_start_decompress(&cinfo);
+
     *width = cinfo.output_width;
     *height = cinfo.output_height;
-    *channels = cinfo.output_components;
-    unsigned long bmp_size = (*width) * (*height) * (*channels);
-    unsigned char* bmp_buffer = (unsigned char*)malloc(bmp_size);
-    if (!bmp_buffer) {
-        fprintf(stderr, "Memory allocation failed\n");
-        jpeg_finish_decompress(&cinfo);
-        jpeg_destroy_decompress(&cinfo);
-        fclose(infile);
-        return NULL;
-    }
-    unsigned char* rowptr[1];
-    while (cinfo.output_scanline < cinfo.output_height) {
-        rowptr[0] = (unsigned char*)bmp_buffer + 3 * cinfo.output_width * cinfo.output_scanline;
-        jpeg_read_scanlines(&cinfo, rowptr, 1);
-    }
+    *channels = cinfo.num_components;
+
+    unsigned long long buff = (*width) * (*height) * 3;
+    unsigned char* data = (unsigned char*) malloc(sizeof(unsigned char) * buff);
+    rowBuffer[0] = (unsigned char*)(&data[0]);
+    jpeg_read_scanlines(&cinfo, &rowBuffer, cinfo.output_height);
     jpeg_finish_decompress(&cinfo);
     jpeg_destroy_decompress(&cinfo);
     fclose(infile);
 
-    return bmp_buffer;
+    return data;
 }

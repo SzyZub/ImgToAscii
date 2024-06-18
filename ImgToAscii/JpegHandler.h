@@ -1,6 +1,8 @@
 #pragma once
 #include <stdio.h>
 #include <jpeglib.h>
+#include <jerror.h>
+
 #define DISP_W 1200
 #define DISP_H 900
 
