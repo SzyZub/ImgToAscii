@@ -4,8 +4,8 @@
 #include "JpegHandler.h"
 
 void DrawImage(unsigned char* image, int width, int height) {
-    for (int i = 0; i < width * height; i++) {
-        al_draw_text(font, al_map_rgb(image[i], image[i + 1], image[i + 2]), (i % width) * 6, (int)(i / height * 6), 0, "T");
+    for (int i = 0; i < width*height; i++) {
+        al_draw_text(font, al_map_rgb(image[3*i], image[3*i + 1], image[3*i + 2]), (i % width) * 6, (int)(i / width * 6), 0, "M");
     }
 }
 
@@ -24,7 +24,6 @@ int main() {
     int width, height, channels;
     unsigned char* image_data = load_jpeg_file(&width, &height, &channels);
     image_data = resize_image(image_data, &width, &height, &channels);
-    printf("%d %d", width, height);
     bool reDraw = true;
     while (true) {
         EventHandler(&reDraw);
