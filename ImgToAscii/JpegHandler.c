@@ -1,23 +1,23 @@
 #include "JpegHandler.h"
 
-unsigned char* resize_image(unsigned char* input, int original_width, int original_height, int channels) {
-    double aspect_ratio = (double)original_width / original_height;
+unsigned char* resize_image(unsigned char* input, int *original_width, int *original_height, int *channels) {
+    double aspect_ratio = (double)(*original_width) / (*original_height);
     int new_width, new_height;
-    if (original_width > DISP_W || original_height > DISP_H) {
-        if ((double)DISP_W / DISP_H > aspect_ratio) {
-            new_width = (int)(DISP_H * aspect_ratio);
-            new_height = DISP_H;
+    if ((*original_width) > 200 || (*original_height) > 150) {
+        if ((double)200 / 150 > aspect_ratio) {
+            new_width = (int)(150 * aspect_ratio);
+            new_height = 150;
         }
         else {
-            new_width = DISP_W;
-            new_height = (int)(DISP_W / aspect_ratio);
+            new_width = 200;
+            new_height = (int)(200 / aspect_ratio);
         }
     }
     else {
-        new_width = original_width;
-        new_height = original_height;
+        new_width = (*original_width);
+        new_height = (*original_height);
     }
-    unsigned char* resized_image = (unsigned char*)malloc(new_width * new_height * channels);
+    unsigned char* resized_image = (unsigned char*)malloc(new_width * new_height * (*channels));
     if (!resized_image) {
         fprintf(stderr, "Failed to allocate memory for resized image\n");
         return NULL;
@@ -25,13 +25,16 @@ unsigned char* resize_image(unsigned char* input, int original_width, int origin
 
     for (int y = 0; y < new_height; y++) {
         for (int x = 0; x < new_width; x++) {
-            int src_x = x * original_width / new_width;
-            int src_y = y * original_height / new_height;
-            for (int c = 0; c < channels; c++) {
-                resized_image[(y * (new_width) + x) * channels + c] = input[(src_y * original_width + src_x) * channels + c];
+            int src_x = x * (*original_width) / new_width;
+            int src_y = y * (*original_height) / new_height;
+            for (int c = 0; c < (*channels); c++) {
+                resized_image[(y * (new_width)+x) * (*channels) + c] = input[(src_y * (*original_width) + src_x) * (*channels) + c];
             }
         }
     }
+    (*original_width) = new_width;
+    (*original_height) = new_height;
+    free(input);
     return resized_image;
 }
 
@@ -56,9 +59,11 @@ unsigned char* load_jpeg_file(int *width, int* height, int *channels) {
     *channels = cinfo.num_components;
 
     unsigned long long buff = (*width) * (*height) * 3;
-    unsigned char* data = (unsigned char*) malloc(sizeof(unsigned char) * buff);
-    rowBuffer[0] = (unsigned char*)(&data[0]);
-    jpeg_read_scanlines(&cinfo, &rowBuffer, cinfo.output_height);
+    unsigned char* data = (unsigned char*) malloc(sizeof(unsigned char)*buff);
+    while (cinfo.output_scanline < cinfo.output_height) {
+        rowBuffer[0] = (unsigned char*)(&data[3 * cinfo.output_width * cinfo.output_scanline]);
+        jpeg_read_scanlines(&cinfo, rowBuffer, 1);
+    }
     jpeg_finish_decompress(&cinfo);
     jpeg_destroy_decompress(&cinfo);
     fclose(infile);

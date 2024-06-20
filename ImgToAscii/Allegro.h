@@ -5,7 +5,7 @@
 #include <stdio.h>
 #define DISP_W 1200
 #define DISP_H 900
-#define FRAMERATE 60
+#define FRAMERATE 10
 
 ALLEGRO_BITMAP* allBuffer;
 ALLEGRO_DISPLAY* allDisplay;
@@ -14,7 +14,6 @@ ALLEGRO_EVENT_QUEUE* allQueue;
 ALLEGRO_EVENT allEvent;
 ALLEGRO_TIMER* allTimer;
 ALLEGRO_FONT* font;
-ALLEGRO_FONT* bigFont;
 
 void InitTest(bool testRes, char* name);
 void InitAllegroVars();
