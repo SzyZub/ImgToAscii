@@ -3,14 +3,14 @@
 unsigned char* resize_image(unsigned char* input, int *original_width, int *original_height, int *channels) {
     double aspect_ratio = (double)(*original_width) / (*original_height);
     int new_width, new_height;
-    if ((*original_width) > 200 || (*original_height) > 150) {
-        if ((double)200 / 150 > aspect_ratio) {
-            new_width = (int)(150 * aspect_ratio);
-            new_height = 150;
+    if ((*original_width) > MAXWIDTH || (*original_height) > MAXHEIGHT) {
+        if ((double)MAXWIDTH / MAXHEIGHT > aspect_ratio) {
+            new_width = (int)(MAXHEIGHT * aspect_ratio);
+            new_height = MAXHEIGHT;
         }
         else {
-            new_width = 200;
-            new_height = (int)(200 / aspect_ratio);
+            new_width = MAXWIDTH;
+            new_height = (int)(MAXWIDTH / aspect_ratio);
         }
     }
     else {

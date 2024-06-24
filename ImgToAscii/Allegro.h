@@ -6,6 +6,8 @@
 #define DISP_W 1200
 #define DISP_H 900
 #define FRAMERATE 10
+#define FONTSIZE 10
+
 
 ALLEGRO_BITMAP* allBuffer;
 ALLEGRO_DISPLAY* allDisplay;

@@ -3,9 +3,16 @@
 #include "Allegro.h"
 #include "JpegHandler.h"
 
+const char lightLevel[32][2] = { "`", ".", ",", ":", ";", "!", ">", "<", "~", "+", "_", "-", "?", "]", "[", "}", "{", "1", "r", "x", "X", "Y", "U", "O", "Z", "M", "W", "&", "8", "%", "B", "@" };
+const char reverseLightLevel[32][2] = { "@", "B", "%", "8", "&", "W", "M", "Z", "O", "U", "Y", "X", "x", "r", "1", "{", "}", "[", "]", "?", "-", "_", "+", "~", "<", ">", "!", ";", ":", ",", ".", "`" };
+
 void DrawImage(unsigned char* image, int width, int height) {
     for (int i = 0; i < width*height; i++) {
-        al_draw_text(font, al_map_rgb(image[3*i], image[3*i + 1], image[3*i + 2]), (i % width) * 6, (int)(i / width * 6), 0, "M");
+        unsigned char r = image[3 * i]; 
+        unsigned char g = image[3 * i + 1];
+        unsigned char b = image[3 * i + 2];
+        int bright = ((int) (0.299 * r + 0.587 * g + 0.114 * b))/8;
+        al_draw_text(font, al_map_rgb(255, 255, 255), (i % width) * FONTSIZE, (int)(i / width * FONTSIZE), 0, lightLevel[bright]);
     }
 }
 
@@ -29,6 +36,7 @@ int main() {
         EventHandler(&reDraw);
         if (reDraw && al_is_event_queue_empty(allQueue)) {
             Draw(&reDraw, image_data, width, height);
+            free(image_data);
         }
     }
 }
