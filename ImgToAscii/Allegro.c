@@ -15,8 +15,11 @@ void InitAllegroVars()
     InitTest(al_init(), "allegro");
     InitTest(al_init_font_addon(), "font addon");
     InitTest(al_init_ttf_addon(), "ttf");
+    InitTest(al_init_primitives_addon(), "primitives");
     font = al_load_ttf_font("font.ttf", FONTSIZE, 0);
     InitTest(font, "font.ttf");
+    bigfont = al_load_ttf_font("font.ttf", FONTSIZE*3, 0);
+    InitTest(bigfont, "font.ttf");
     allBuffer = al_create_bitmap(DISP_W, DISP_H);
     InitTest(allBuffer, "bitmap allBuffer");
     allDisplay = al_create_display(DISP_W, DISP_H);
@@ -34,6 +37,9 @@ void EventHandler(bool* reDraw) {
     switch (allEvent.type) {
     case ALLEGRO_EVENT_DISPLAY_CLOSE:
         exit(-1);
+        break;
+    case ALLEGRO_EVENT_TIMER:
+        *reDraw = true;
         break;
     }
 }

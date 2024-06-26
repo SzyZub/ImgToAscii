@@ -4,8 +4,6 @@
 #include <jerror.h>
 #include <stdlib.h>
 
-#define DISP_W 1200
-#define DISP_H 900
 #define MAXWIDTH 120
 #define MAXHEIGHT 90
 
