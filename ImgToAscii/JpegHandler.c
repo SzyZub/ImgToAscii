@@ -47,7 +47,6 @@ unsigned char* load_jpeg_file(int *width, int* height, int *channels) {
         fprintf(stderr, "Error opening file, it isn't put into the imageFolder, has a wrong format or doesn't have a 'image' name");
         return NULL;
     }
-
     cinfo.err = jpeg_std_error(&jerr);
     jpeg_create_decompress(&cinfo);
     jpeg_stdio_src(&cinfo, infile);

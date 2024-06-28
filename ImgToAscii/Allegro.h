@@ -9,6 +9,13 @@
 #define FRAMERATE 10
 #define FONTSIZE 10
 
+const char lightLevel[32][2];
+const char reverseLightLevel[32][2];
+
+typedef struct mouseInteract {
+	bool pressed;
+	int x, y;
+}mouseInteract;
 
 ALLEGRO_BITMAP* allBuffer;
 ALLEGRO_DISPLAY* allDisplay;
@@ -18,7 +25,9 @@ ALLEGRO_EVENT allEvent;
 ALLEGRO_TIMER* allTimer;
 ALLEGRO_FONT* font;
 ALLEGRO_FONT* bigfont;
+mouseInteract mouse;
 
 void InitTest(bool testRes, char* name);
 void InitAllegroVars();
-void EventHandler(bool* reDraw);
+void extractAscii(unsigned char* image, int width, int height);
+void EventHandler(bool* reDraw, unsigned char* image, int width, int height);

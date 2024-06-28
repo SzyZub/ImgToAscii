@@ -3,8 +3,6 @@
 #include "Allegro.h"
 #include "JpegHandler.h"
 
-const char lightLevel[32][2] = { "`", ".", ",", ":", ";", "!", ">", "<", "~", "+", "_", "-", "?", "]", "[", "}", "{", "1", "r", "x", "X", "Y", "U", "O", "Z", "M", "W", "&", "8", "%", "B", "@" };
-const char reverseLightLevel[32][2] = { "@", "B", "%", "8", "&", "W", "M", "Z", "O", "U", "Y", "X", "x", "r", "1", "{", "}", "[", "]", "?", "-", "_", "+", "~", "<", ">", "!", ";", ":", ",", ".", "`" };
 bool darkmode = true;
 bool color = true;
 bool menu = true;
@@ -36,20 +34,27 @@ void DrawImage(unsigned char* image, int width, int height) {
         generated = true;
 }
 
-void DrawDrawing(bool* reDraw, unsigned char* image, int width, int height) {
+void DrawDrawing(bool* reDraw, unsigned char** image, int width, int height) {
     if (!generated) {
         al_set_target_bitmap(allBuffer);
         if (darkmode)
             al_clear_to_color(al_map_rgb(0, 0, 0));
         else
-            al_clear_to_color(al_map_rgb(210, 210, 210));
-        DrawImage(image, width, height);
+            al_clear_to_color(al_map_rgb(255, 255, 255));
+        DrawImage(*image, width, height);
         al_draw_filled_rectangle(0, 900, 1200, 950, al_map_rgb(235, 235, 235));
         al_draw_text(bigfont, al_map_rgb(10, 10, 10), (0 + 1200) / 2, (900 + 950 - al_get_font_line_height(bigfont)) / 2, ALLEGRO_ALIGN_CENTRE, "Back to Menu");
         al_set_target_backbuffer(allDisplay);
         al_draw_scaled_bitmap(allBuffer, 0, 0, DISP_W, DISP_H, 0, 0, DISP_W, DISP_H, 0);
         al_flip_display();
         *reDraw = false;
+    }
+    if (mouse.pressed == true) {
+        mouse.pressed = false;
+        if (mouse.y > 900) {
+            menu = true;
+            generated = false;
+        }
     }
 }
 
@@ -77,6 +82,24 @@ void DrawMenu(bool* reDraw) {
     al_draw_scaled_bitmap(allBuffer, 0, 0, DISP_W, DISP_H, 0, 0, DISP_W, DISP_H, 0);
     al_flip_display();
     *reDraw = false;
+    if (mouse.pressed == true) {
+        mouse.pressed = false;
+        if (mouse.y > 100 && mouse.y < 300) {
+            if (mouse.x > 200 && mouse.x < 580)
+                darkmode = true;
+            else if (mouse.x > 620 && mouse.x < 1000)
+                darkmode = false;
+        }
+        else if (mouse.y > 400 && mouse.y < 600) {
+            if (mouse.x > 200 && mouse.x < 580)
+                color = true;
+            else if (mouse.x > 620 && mouse.x < 1000)
+                color = false;
+        }
+        else if (mouse.y > 700 && mouse.y < 800 && mouse.x > 380 && mouse.x < 820){
+            menu = false;
+        }
+    }
 }
 
 int main() {
@@ -85,11 +108,12 @@ int main() {
     unsigned char* image_data = load_jpeg_file(&width, &height, &channels);
     image_data = resize_image(image_data, &width, &height, &channels);
     bool reDraw = true;
+    mouse.pressed = false;
     while (true) {
-        EventHandler(&reDraw);
+        EventHandler(&reDraw, image_data, width, height);
         if (reDraw && al_is_event_queue_empty(allQueue)) {
             if (!menu) {
-                DrawDrawing(&reDraw, image_data, width, height);
+                DrawDrawing(&reDraw, &image_data, width, height);
             }
             else {
                 DrawMenu(&reDraw);
